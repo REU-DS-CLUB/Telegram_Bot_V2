@@ -18,8 +18,6 @@ form_service = discovery.build('forms', 'v1', http=creds.authorize(
     Http()), discoveryServiceUrl=DISCOVERY_DOC)
 
 form_id = '1J6Z5vL9xk6sJ9tEz31G_XEY7mBPLsodXpZnjwsYVrUA'
-result = form_service.forms().responses().list(
-    formId=form_id).execute()
 
 
 # переводит время из формата YYYY-MM-DDTH:M:S.MS в unix
@@ -38,7 +36,7 @@ def check_actual(tmptime: float):
 
 
 # создает список дат ответов на форму
-def get_response_time(self):
+def get_response_time(result):
     create_times = []
     for i in range(len(result['responses'])):
         create_time = result['responses'][i]['createTime']
@@ -47,7 +45,7 @@ def get_response_time(self):
 
 
 # создает список, состоящий из нужной информации о каждом кандидате
-def get_candidate_info(self):
+def get_candidate_info(result):
     info = []
     for i in range(len(result['responses'])):
         info_str = ""
@@ -61,7 +59,7 @@ def get_candidate_info(self):
 
 
 # создает список информации об актуальных кандидатах
-def get_relevant_info_list(self):
+def get_relevant_info_list(result):
     create_times = get_response_time(result)
     info_list = []
     for i in range(len(create_times)):
@@ -71,7 +69,9 @@ def get_relevant_info_list(self):
 
 
 # возвращает отформатированную ифнормацию об актуальных кандидатах
-def get_relevant_forms(self):
+def get_relevant_forms(result):
+    result = form_service.forms().responses().list(
+        formId=form_id).execute()
     info_list = get_relevant_info_list(result)
     if info_list:
         str_info = "Пам-пам новые заявочки" + "\n"
@@ -83,7 +83,6 @@ def get_relevant_forms(self):
         return str_info
     else:
         return "Пам-пам никто не заполнил форму"
-
 
 
 
